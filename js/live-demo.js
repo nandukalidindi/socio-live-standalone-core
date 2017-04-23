@@ -73,31 +73,31 @@ var $eventName = $('[name="event_name"]');
 var $settingsPanel = $('div[class="panel-inner"]');
 
 var users = {
-  1: new BasicUser(1, "Desmond", "Strickland", "Fishery", Date.now()),
-  2: new BasicUser(2, 'Thaddeus','Galvan','Professional Training & Coaching', Date.now()),
-  3: new BasicUser(3, 'Lamont','Friedman','Automotive', Date.now()),
-  4: new BasicUser(4, 'Martin','Holland','Information Technology and Services', Date.now()),
-  5: new BasicUser(5, 'Nancy','Carr','Information Technology and Services', Date.now()),
-  6: new BasicUser(6, 'Graham','Norris',' Ceramics & Concrete', Date.now()),
-  7: new BasicUser(7, 'Royce','Lester','Veterinary', Date.now()),
-  8: new BasicUser(8, 'Emily','Herman','Alternative Dispute Resolution', Date.now()),
-  9: new BasicUser(9, 'Odessa','Clay','Warehousing', Date.now()),
-  10: new BasicUser(10, 'Enid','Castaneda','Airlines/Aviation', Date.now()),
-  11: new BasicUser(11, 'Mara','Schultz','Facilities Services', Date.now()),
-  12: new BasicUser(12, 'Romeo','Navarro','Information Technology and Services', Date.now()),
-  13: new BasicUser(13, 'Jess','Clay','Banking', Date.now()),
-  14: new BasicUser(14, 'Aimee','Guerrero','Biotechnology', Date.now()),
-  15: new BasicUser(15, 'Dino','Payne','Computer Games', Date.now()),
-  16: new BasicUser(16, 'Susie','Velasquez','Nanotechnology', Date.now()),
-  17: new BasicUser(17, 'Velma','Walton','Restaurants', Date.now()),
-  18: new BasicUser(18, 'Rosario','Cook','Professional Training & Coaching', Date.now()),
-  19: new BasicUser(19, 'Maximo','Morgan','Transportation/Trucking/Railroad', Date.now()),
-  20: new BasicUser(20, 'Bettye','Sandoval','Tobacco', Date.now()),
-  21: new BasicUser(21, 'Eve','Malone','Judiciary', Date.now()),
-  22: new BasicUser(22, 'Daryl','Carney','Real Estate', Date.now()),
-  23: new BasicUser(23, 'Britney','Pennington','Recreational Facilities and Services', Date.now()),
-  24: new BasicUser(24, 'Phyllis','Chung','International Affairs', Date.now()),
-  25: new BasicUser(25, 'Susanne','Clark','Facilities Services', Date.now())
+  // 1: new BasicUser(1, "Desmond", "Strickland", "Fishery", Date.now()),
+  // 2: new BasicUser(2, 'Thaddeus','Galvan','Professional Training & Coaching', Date.now()),
+  // 3: new BasicUser(3, 'Lamont','Friedman','Automotive', Date.now()),
+  // 4: new BasicUser(4, 'Martin','Holland','Information Technology and Services', Date.now()),
+  // 5: new BasicUser(5, 'Nancy','Carr','Information Technology and Services', Date.now()),
+  // 6: new BasicUser(6, 'Graham','Norris',' Ceramics & Concrete', Date.now()),
+  // 7: new BasicUser(7, 'Royce','Lester','Veterinary', Date.now()),
+  // 8: new BasicUser(8, 'Emily','Herman','Alternative Dispute Resolution', Date.now()),
+  // 9: new BasicUser(9, 'Odessa','Clay','Warehousing', Date.now()),
+  // 10: new BasicUser(10, 'Enid','Castaneda','Airlines/Aviation', Date.now()),
+  // 11: new BasicUser(11, 'Mara','Schultz','Facilities Services', Date.now()),
+  // 12: new BasicUser(12, 'Romeo','Navarro','Information Technology and Services', Date.now()),
+  // 13: new BasicUser(13, 'Jess','Clay','Banking', Date.now()),
+  // 14: new BasicUser(14, 'Aimee','Guerrero','Biotechnology', Date.now()),
+  // 15: new BasicUser(15, 'Dino','Payne','Computer Games', Date.now()),
+  // 16: new BasicUser(16, 'Susie','Velasquez','Nanotechnology', Date.now()),
+  // 17: new BasicUser(17, 'Velma','Walton','Restaurants', Date.now()),
+  // 18: new BasicUser(18, 'Rosario','Cook','Professional Training & Coaching', Date.now()),
+  // 19: new BasicUser(19, 'Maximo','Morgan','Transportation/Trucking/Railroad', Date.now()),
+  // 20: new BasicUser(20, 'Bettye','Sandoval','Tobacco', Date.now()),
+  // 21: new BasicUser(21, 'Eve','Malone','Judiciary', Date.now()),
+  // 22: new BasicUser(22, 'Daryl','Carney','Real Estate', Date.now()),
+  // 23: new BasicUser(23, 'Britney','Pennington','Recreational Facilities and Services', Date.now()),
+  // 24: new BasicUser(24, 'Phyllis','Chung','International Affairs', Date.now()),
+  // 25: new BasicUser(25, 'Susanne','Clark','Facilities Services', Date.now())
 };
 
 var orderedUsers = [];
@@ -154,7 +154,7 @@ function runControl() {
       }
 
     }
-    
+
     console.log("Stopping: " + control.stopping + " and Winner: " + control.winner);
     carousel.attr('data-state', (increment % minimum) + 1);
     var thisFigure = $($figures[(increment + 3) % minimum]);
@@ -239,7 +239,11 @@ var $industriesList = $('#industriesList');
 
 function setupActions() {
   $settingsPanel.find('b[name="attendee_drawing"]').on('click', function(e) {
-    openAttendeeDrawing();
+    if(document.getElementById('csv-uploader').files.length === 1) {
+      openAttendeeDrawing();
+    } else {
+      alert("PLEASE UPLOAD A CSV FILE TO START THE SPIN");
+    }
   });
 
   $settingsPanel.find('b[name="fullscreen"]').on('click', toggleFullScreen);
@@ -356,6 +360,27 @@ $('.theme-selector').on('click', function(e) {
     }
   });
 });
+
+$('#upload-click').on('click', function(event) {
+  document.getElementById('csv-uploader').click();
+})
+
+$('#csv-uploader').on('change', function(evt) {
+  var fileReader = new FileReader();
+  fileReader.onload = function(fileLoadedEvent){
+      var textFromFileLoaded = fileReader.result;
+      var userDetails = [];
+      textFromFileLoaded.split("\n").forEach(function(line, index) {
+        if(index !== 0 && line !== "") {
+          userDetails = line.split(",");
+          users[index] = new BasicUser(index, userDetails[0], userDetails[1], userDetails[2], Date.now());
+        }
+      });
+      document.getElementsByName('attendee_drawing')[0].click();
+  };
+
+  fileReader.readAsBinaryString(event.target.files[0]);
+})
 
 $(document).ready(function() {
 
